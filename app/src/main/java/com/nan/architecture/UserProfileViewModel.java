@@ -1,6 +1,7 @@
 package com.nan.architecture;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
 
 /**
@@ -13,10 +14,12 @@ public class UserProfileViewModel extends ViewModel  {
 
     public void init(String userId) {
         mUserId = userId;
+
+        // 请求User
+        mUser = new MediatorLiveData<>();
     }
 
     public LiveData<User> getUser() {
-
         return mUser;
     }
 }
