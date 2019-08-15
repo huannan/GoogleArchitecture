@@ -49,7 +49,7 @@ public class UserProfileFragment extends Fragment {
         mBtnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.
+//                mViewModel.
             }
         });
     }
