@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -17,10 +16,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.nan.architecture.R;
 import com.nan.architecture.db.User;
+import com.nan.architecture.mvvm.BaseActivity;
 
-public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserProfileActivity extends BaseActivity<UserProfileViewModel> implements View.OnClickListener {
 
-    private UserProfileViewModel mViewModel;
+    private TextView mTvPageState;
     private EditText mEtUserName;
     private Button mBtnSearch;
     private ImageView mIvImage;
@@ -33,6 +33,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
+        mTvPageState = findViewById(R.id.page_state);
         mEtUserName = findViewById(R.id.et_username);
         mBtnSearch = findViewById(R.id.btn_search);
         mIvImage = findViewById(R.id.iv_image);
@@ -40,9 +41,15 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         mTvCompany = findViewById(R.id.tv_company);
         mTvWebsite = findViewById(R.id.tv_website);
         mBtnSearch.setOnClickListener(this);
+    }
 
-        mViewModel = ViewModelProviders.of(this).get(UserProfileViewModel.class);
-        mViewModel.init();
+    @Override
+    protected UserProfileViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(UserProfileViewModel.class);
+    }
+
+    @Override
+    protected void init() {
         mViewModel.getUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
@@ -51,6 +58,26 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         });
+    }
+
+    @Override
+    protected void showLoading() {
+        mTvPageState.setText("正在加载");
+    }
+
+    @Override
+    protected void showLoadSuccess() {
+        mTvPageState.setText("加载成功");
+    }
+
+    @Override
+    protected void showLoadError() {
+        mTvPageState.setText("网络异常");
+    }
+
+    @Override
+    protected void showNoNetwork() {
+        mTvPageState.setText("暂无网络");
     }
 
     private void updateUI(User user) {

@@ -1,70 +1,68 @@
 package com.nan.architecture.userprofile;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.nan.architecture.api.Api;
+import com.nan.architecture.api.NetworkManager;
 import com.nan.architecture.db.User;
+import com.nan.architecture.mvvm.BaseViewModel;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class UserProfileViewModel extends AndroidViewModel {
+public class UserProfileViewModel extends BaseViewModel {
 
     private MutableLiveData<User> mUser = new MutableLiveData<>();
     private MutableLiveData<String> mUserName = new MutableLiveData<>();
-    private Api mApi;
-    CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-
 
     public UserProfileViewModel(@NonNull Application application) {
         super(application);
     }
 
+    @Override
     public void init() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        mApi = retrofit.create(Api.class);
-
         mUserName.observeForever(new Observer<String>() {
             @Override
             public void onChanged(@Nullable String user) {
-                mApi.getUser(mUserName.getValue())
+                NetworkManager.getInstance().getApi().getUser(mUserName.getValue())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new SingleObserver<User>() {
                             @Override
                             public void onSubscribe(Disposable d) {
-
+                                setCurrentState(PageState.LOADING);
                             }
 
                             @Override
                             public void onSuccess(User user) {
-                                mUser.setValue(user);
+                                if (user != null) {
+                                    setCurrentState(PageState.LOAD_SUCCESS);
+                                    mUser.setValue(user);
+                                } else {
+                                    setCurrentState(PageState.LOAD_ERROR);
+                                }
                             }
 
                             @Override
                             public void onError(Throwable e) {
-
+                                // 这里需要判断网络状态
+                                setCurrentState(PageState.LOAD_ERROR);
                             }
                         });
             }
         });
+    }
+
+    @Override
+    public boolean needShowLoading() {
+        return true;
     }
 
     public LiveData<User> getUser() {
@@ -73,12 +71,6 @@ public class UserProfileViewModel extends AndroidViewModel {
 
     public void searchUser(String userName) {
         mUserName.setValue(userName);
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        mCompositeDisposable.clear();
     }
 
 }
