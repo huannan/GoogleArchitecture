@@ -20,6 +20,8 @@ import com.nan.architecture.mvvm.BaseActivity;
 
 public class UserProfileActivity extends BaseActivity<UserProfileViewModel> implements View.OnClickListener {
 
+    public static final String TAG = "UserProfileActivity";
+
     private TextView mTvPageState;
     private EditText mEtUserName;
     private Button mBtnSearch;
@@ -32,7 +34,10 @@ public class UserProfileActivity extends BaseActivity<UserProfileViewModel> impl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+        initView();
+    }
 
+    protected void initView() {
         mTvPageState = findViewById(R.id.page_state);
         mEtUserName = findViewById(R.id.et_username);
         mBtnSearch = findViewById(R.id.btn_search);
@@ -41,15 +46,8 @@ public class UserProfileActivity extends BaseActivity<UserProfileViewModel> impl
         mTvCompany = findViewById(R.id.tv_company);
         mTvWebsite = findViewById(R.id.tv_website);
         mBtnSearch.setOnClickListener(this);
-    }
 
-    @Override
-    protected UserProfileViewModel createViewModel() {
-        return ViewModelProviders.of(this).get(UserProfileViewModel.class);
-    }
-
-    @Override
-    protected void init() {
+        mTvPageState.setText("初始化，比如设置标题栏等");
         mViewModel.getUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
@@ -59,6 +57,12 @@ public class UserProfileActivity extends BaseActivity<UserProfileViewModel> impl
             }
         });
     }
+
+    @Override
+    protected UserProfileViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(UserProfileViewModel.class);
+    }
+
 
     @Override
     protected void showLoading() {

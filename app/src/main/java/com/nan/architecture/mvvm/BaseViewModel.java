@@ -14,14 +14,12 @@ public abstract class BaseViewModel extends AndroidViewModel {
     protected CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     @IntDef({
-            PageState.INIT,
             PageState.LOADING,
             PageState.LOAD_SUCCESS,
             PageState.LOAD_ERROR,
             PageState.NO_NETWORK
     })
     public @interface PageState {
-        int INIT = -1;
         int LOADING = 0;
         int LOAD_SUCCESS = 1;
         int LOAD_ERROR = 2;
@@ -30,7 +28,6 @@ public abstract class BaseViewModel extends AndroidViewModel {
 
     public BaseViewModel(@NonNull Application application) {
         super(application);
-        init();
     }
 
     public MutableLiveData<Integer> getCurrentState() {
@@ -42,7 +39,6 @@ public abstract class BaseViewModel extends AndroidViewModel {
     }
 
     protected void init() {
-        setCurrentState(PageState.INIT);
         if (needShowLoading()) {
             setCurrentState(PageState.LOADING);
         } else {

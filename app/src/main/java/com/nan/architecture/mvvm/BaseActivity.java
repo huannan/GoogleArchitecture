@@ -17,32 +17,30 @@ public abstract class BaseActivity<VM extends BaseViewModel> extends AppCompatAc
         mViewModel.getCurrentState().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer pageState) {
-                switch (pageState) {
-                    case BaseViewModel.PageState.INIT:
-                        init();
-                        break;
-                    case BaseViewModel.PageState.LOADING:
-                        showLoading();
-                        break;
-                    case BaseViewModel.PageState.LOAD_SUCCESS:
-                        showLoadSuccess();
-                        break;
-                    case BaseViewModel.PageState.LOAD_ERROR:
-                        showLoadError();
-                        break;
-                    case BaseViewModel.PageState.NO_NETWORK:
-                        showNoNetwork();
-                        break;
-                    default:
-                        break;
+                if (pageState != null) {
+                    switch (pageState) {
+                        case BaseViewModel.PageState.LOADING:
+                            showLoading();
+                            break;
+                        case BaseViewModel.PageState.LOAD_SUCCESS:
+                            showLoadSuccess();
+                            break;
+                        case BaseViewModel.PageState.LOAD_ERROR:
+                            showLoadError();
+                            break;
+                        case BaseViewModel.PageState.NO_NETWORK:
+                            showNoNetwork();
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         });
+        mViewModel.init();
     }
 
     protected abstract VM createViewModel();
-
-    protected abstract void init();
 
     protected abstract void showLoading();
 

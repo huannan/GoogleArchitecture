@@ -28,6 +28,7 @@ public class UserProfileViewModel extends BaseViewModel {
 
     @Override
     public void init() {
+        super.init();
         mUserName.observeForever(new Observer<String>() {
             @Override
             public void onChanged(@Nullable String user) {
@@ -62,7 +63,7 @@ public class UserProfileViewModel extends BaseViewModel {
 
     @Override
     public boolean needShowLoading() {
-        return true;
+        return false;
     }
 
     public LiveData<User> getUser() {
