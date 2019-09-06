@@ -21,6 +21,7 @@ public class UserProfileViewModel extends BaseViewModel {
 
     private MutableLiveData<User> mUser = new MutableLiveData<>();
     private MutableLiveData<String> mUserName = new MutableLiveData<>();
+    private Observer<String> mUserNameObserver;
 
     public UserProfileViewModel(@NonNull Application application) {
         super(application);
@@ -29,7 +30,7 @@ public class UserProfileViewModel extends BaseViewModel {
     @Override
     public void init() {
         super.init();
-        mUserName.observeForever(new Observer<String>() {
+        mUserNameObserver = new Observer<String>() {
             @Override
             public void onChanged(@Nullable String user) {
                 NetworkManager.getInstance().getApi().getUser(mUserName.getValue())
@@ -58,7 +59,8 @@ public class UserProfileViewModel extends BaseViewModel {
                             }
                         });
             }
-        });
+        };
+        mUserName.observeForever(mUserNameObserver);
     }
 
     @Override
@@ -74,4 +76,9 @@ public class UserProfileViewModel extends BaseViewModel {
         mUserName.setValue(userName);
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mUserName.removeObserver(mUserNameObserver);
+    }
 }
